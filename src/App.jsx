@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { ChatMessage } from './components/ChatMessage';
-import { DifficultySelector } from './components/DifficultySelector';
-import { InputArea } from './components/InputArea';
-import { Sparkles } from 'lucide-react';
-import { deepseekService } from './services/deepseekService';
+import React, { useState, useEffect } from "react";
+import { ChatMessage } from "./components/ChatMessage";
+import { DifficultySelector } from "./components/DifficultySelector";
+import { InputArea } from "./components/InputArea";
+import { Sparkles } from "lucide-react";
+import { geminiService } from "./services/geminiService";
 
 function App() {
   const [messages, setMessages] = useState([]);
-  const [difficulty, setDifficulty] = useState('beginner');
+  const [difficulty, setDifficulty] = useState("beginner");
   const [isListening, setIsListening] = useState(false);
   const [recognition, setRecognition] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -17,7 +17,7 @@ function App() {
       const recognition = new window.webkitSpeechRecognition();
       recognition.continuous = false;
       recognition.interimResults = false;
-      recognition.lang = 'en-US';
+      recognition.lang = "en-US";
 
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
@@ -26,7 +26,7 @@ function App() {
       };
 
       recognition.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
+        console.error("Speech recognition error:", event.error);
         setIsListening(false);
       };
 
@@ -36,7 +36,7 @@ function App() {
 
       setRecognition(recognition);
     } else {
-      console.warn('Speech recognition not supported');
+      console.warn("Speech recognition not supported");
     }
 
     return () => {
@@ -46,53 +46,68 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    // Проверка дали API ключът е наличен
+    if (!import.meta.env.VITE_DEEPSEEK_API_KEY) {
+      console.error(
+        "DeepSeek API key is missing! Please check your .env file."
+      );
+    }
+  }, []);
+
   const handleSendMessage = async (content) => {
     const newMessage = {
       id: Date.now().toString(),
       content,
-      role: 'user',
+      role: "user",
       timestamp: new Date(),
     };
     setMessages((prev) => [...prev, newMessage]);
-    
+
     setIsLoading(true);
-    
+
     try {
-      // Извикване на DeepSeek API за получаване на обратна връзка
-      const response = await deepseekService.getLanguageFeedback(content);
-      
+      console.log("Sending request to DeepSeek API...");
+      console.log(
+        "API Key:",
+        import.meta.env.VITE_DEEPSEEK_API_KEY.substring(0, 5) + "..."
+      );
+
+      const response = await geminiService.getLanguageFeedback(content);
+      console.log("Full API response:", response);
+
       let aiResponse = "Sorry, I couldn't process your request.";
-      
-      if (response && response.choices && response.choices.length > 0) {
-        aiResponse = response.choices[0].message.content;
-        
+
+      if (response && response.candidates && response.candidates.length > 0) {
+        aiResponse = response.candidates[0].content.parts[0].text;
+
         // Адаптиране на отговора според нивото на трудност
-        if (difficulty === 'beginner') {
+        if (difficulty === "beginner") {
           aiResponse = simplifyResponse(aiResponse);
-        } else if (difficulty === 'advanced') {
+        } else if (difficulty === "advanced") {
           aiResponse = enhanceResponse(aiResponse);
         }
       }
-      
+
       const aiMessage = {
         id: (Date.now() + 1).toString(),
         content: aiResponse,
-        role: 'assistant',
+        role: "assistant",
         timestamp: new Date(),
       };
-      
+
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
-      console.error('Error getting AI response:', error);
-      
-      // Резервен отговор в случай на грешка
+      console.error("Detailed error:", error);
+      console.error("Error stack:", error.stack);
+
       const fallbackResponse = {
         id: (Date.now() + 1).toString(),
-        content: "I'm having trouble connecting to the language service. Please try again later.",
-        role: 'assistant',
+        content: `Error: ${error.message}`,
+        role: "assistant",
         timestamp: new Date(),
       };
-      
+
       setMessages((prev) => [...prev, fallbackResponse]);
     } finally {
       setIsLoading(false);
@@ -102,17 +117,20 @@ function App() {
   // Помощни функции за адаптиране на отговора според нивото
   const simplifyResponse = (response) => {
     // За начинаещи - опростяваме отговора
-    return response.split('.').slice(0, 2).join('.') + '.';
+    return response.split(".").slice(0, 2).join(".") + ".";
   };
 
   const enhanceResponse = (response) => {
     // За напреднали - добавяме допълнителна информация
-    return response + " Consider exploring more advanced vocabulary and complex sentence structures to enhance your fluency.";
+    return (
+      response +
+      " Consider exploring more advanced vocabulary and complex sentence structures to enhance your fluency."
+    );
   };
 
   const handleStartVoice = () => {
     if (!recognition) {
-      alert('Speech recognition is not supported in your browser');
+      alert("Speech recognition is not supported in your browser");
       return;
     }
 
@@ -149,7 +167,9 @@ function App() {
             ))}
             {isLoading && (
               <div className="flex justify-center py-4">
-                <div className="animate-pulse text-gray-500">AI is thinking...</div>
+                <div className="animate-pulse text-gray-500">
+                  AI is thinking...
+                </div>
               </div>
             )}
           </div>
