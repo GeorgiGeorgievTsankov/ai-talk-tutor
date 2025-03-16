@@ -6,7 +6,6 @@ export const InputArea = ({ onSendMessage, onStartVoice, isListening, isLoading 
   const [isMicSupported, setIsMicSupported] = useState(false);
 
   useEffect(() => {
-    // Проверяваме дали браузърът поддържа Web Speech API
     setIsMicSupported(!!window.webkitSpeechRecognition);
   }, []);
 

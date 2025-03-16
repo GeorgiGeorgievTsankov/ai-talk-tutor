@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { ChatMessage } from "./components/ChatMessage";
 import { DifficultySelector } from "./components/DifficultySelector";
 import { InputArea } from "./components/InputArea";
-import { Sparkles } from "lucide-react";
 import { geminiService } from "./services/geminiService";
+import tutorLogo from "./assets/img/tutor.png";
 
 function App() {
   const [messages, setMessages] = useState([]);
@@ -47,7 +47,6 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // Проверка дали API ключът е наличен
     if (!import.meta.env.VITE_DEEPSEEK_API_KEY) {
       console.error(
         "DeepSeek API key is missing! Please check your .env file."
@@ -81,7 +80,6 @@ function App() {
       if (response && response.candidates && response.candidates.length > 0) {
         aiResponse = response.candidates[0].content.parts[0].text;
 
-        // Адаптиране на отговора според нивото на трудност
         if (difficulty === "beginner") {
           aiResponse = simplifyResponse(aiResponse);
         } else if (difficulty === "advanced") {
@@ -97,6 +95,8 @@ function App() {
       };
 
       setMessages((prev) => [...prev, aiMessage]);
+
+      speakText(aiResponse);
     } catch (error) {
       console.error("Detailed error:", error);
       console.error("Error stack:", error.stack);
@@ -114,14 +114,11 @@ function App() {
     }
   };
 
-  // Помощни функции за адаптиране на отговора според нивото
   const simplifyResponse = (response) => {
-    // За начинаещи - опростяваме отговора
     return response.split(".").slice(0, 2).join(".") + ".";
   };
 
   const enhanceResponse = (response) => {
-    // За напреднали - добавяме допълнителна информация
     return (
       response +
       " Consider exploring more advanced vocabulary and complex sentence structures to enhance your fluency."
@@ -142,13 +139,27 @@ function App() {
     setIsListening(!isListening);
   };
 
+  function speakText(text) {
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "en-US"; // Можеш да смениш езика
+    speech.rate = 1; // Скорост на речта
+    speech.pitch = 1; // Височина на гласа
+    speech.volume = 1; // Сила на звука
+    window.speechSynthesis.speak(speech);
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="bg-white shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Sparkles className="w-8 h-8 text-purple-500" />
+              <img
+                src={tutorLogo}
+                alt="tutor"
+                className="w-10 h-10 object-contain"
+              />
+
               <h1 className="text-2xl font-bold text-gray-900">TalkTutor</h1>
             </div>
             <DifficultySelector
