@@ -141,10 +141,10 @@ function App() {
 
   function speakText(text) {
     const speech = new SpeechSynthesisUtterance(text);
-    speech.lang = "en-US"; // Можеш да смениш езика
-    speech.rate = 1; // Скорост на речта
-    speech.pitch = 1; // Височина на гласа
-    speech.volume = 1; // Сила на звука
+    speech.lang = "en-US"; 
+    speech.rate = 1; 
+    speech.pitch = 1; 
+    speech.volume = 1; 
     window.speechSynthesis.speak(speech);
   }
 

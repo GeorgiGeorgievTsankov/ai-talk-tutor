@@ -1,5 +1,4 @@
 import React from 'react';
-import { Brain } from 'lucide-react';
 
 export const DifficultySelector = ({ difficulty, onChange }) => {
   return (
