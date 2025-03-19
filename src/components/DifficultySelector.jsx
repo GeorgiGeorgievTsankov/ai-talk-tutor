@@ -1,12 +1,12 @@
-import React from 'react';
+import React from "react";
 
 export const DifficultySelector = ({ difficulty, onChange }) => {
   return (
-    <div className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm">
+    <div className="w-full bg-gray-200 sm:w-auto flex items-center  sm:p-4 ">
       <select
         value={difficulty}
         onChange={(e) => onChange(e.target.value)}
-        className="bg-white border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+        className="w-full sm:w-auto bg-gray-100 border-gray-500 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
       >
         <option value="beginner">Beginner</option>
         <option value="intermediate">Intermediate</option>

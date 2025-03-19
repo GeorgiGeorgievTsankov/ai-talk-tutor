@@ -2,9 +2,16 @@ const API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY;
 const API_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
+let conversationHistory = [];
+
 export const geminiService = {
   async getLanguageFeedback(text) {
     try {
+      conversationHistory.push({
+        role: "user",
+        parts: [{ text }]
+      });
+
       const response = await fetch(`${API_URL}?key=${API_KEY}`, {
         method: "POST",
         headers: {
@@ -15,14 +22,19 @@ export const geminiService = {
             {
               parts: [
                 {
-                  text: `You are an English teacher. Start by asking a simple, engaging question like: "How are you today?" or "What did you do today?". 
-  After the student responds, carefully check for any grammatical mistakes. If there are mistakes, explain them clearly and provide corrections. 
-  If there are no mistakes, praise the student and continue with a new question that flows naturally from the previous one. 
-  Keep the conversation engaging, positive, and interactive. Here's the student's input: "${text}"`,
-                },
-              ],
-            },
+                  text: "You are an English language tutor. Keep the context of our conversation. Current conversation history:\n" +
+                    conversationHistory.map(msg => `${msg.role}: ${msg.parts[0].text}`).join("\n") +
+                    "\nNow respond to the last message, keeping the conversation context and providing language feedback and ask something new."
+                }
+              ]
+            }
           ],
+          generationConfig: {
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 1024,
+          }
         }),
       });
 
@@ -33,12 +45,27 @@ export const geminiService = {
       }
 
       const data = await response.json();
-      console.log("API Response:", data);
+      
+      if (data.candidates && data.candidates[0]) {
+        conversationHistory.push({
+          role: "assistant",
+          parts: [{ text: data.candidates[0].content.parts[0].text }]
+        });
+      }
+
+      if (conversationHistory.length > 10) {
+        conversationHistory = conversationHistory.slice(-10);
+      }
+
+      console.log("Conversation History:", conversationHistory);
       return data;
     } catch (error) {
       console.error("Error calling Gemini API:", error);
       throw error;
     }
   },
-};
 
+  clearConversation() {
+    conversationHistory = [];
+  }
+};

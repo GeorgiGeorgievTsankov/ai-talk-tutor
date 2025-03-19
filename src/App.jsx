@@ -141,43 +141,57 @@ function App() {
 
   function speakText(text) {
     const speech = new SpeechSynthesisUtterance(text);
-    speech.lang = "en-US"; 
-    speech.rate = 1; 
-    speech.pitch = 1; 
-    speech.volume = 1; 
+    speech.lang = "en-US";
+    speech.rate = 1;
+    speech.pitch = 1;
+    speech.volume = 1;
     window.speechSynthesis.speak(speech);
   }
 
+  const handleClearConversation = () => {
+    geminiService.clearConversation();
+    setMessages([]);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
+      <header className="bg-gray-200 shadow-sm">
+        <div className="max-w-4xl mx-auto px-4 py-4 sm:py-6">
+          <div className="flex flex-col sm:flex-row items-center gap-4">
             <div className="flex items-center gap-3">
               <img
                 src={tutorLogo}
                 alt="tutor"
-                className="w-10 h-10 object-contain"
+                className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
               />
-
-              <h1 className="text-2xl font-bold text-gray-900">TalkTutor</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+                TalkTutor
+              </h1>
             </div>
-            <DifficultySelector
-              difficulty={difficulty}
-              onChange={setDifficulty}
-            />
+            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 sm:ml-auto">
+              <DifficultySelector
+                difficulty={difficulty}
+                onChange={setDifficulty}
+              />
+              <button
+                onClick={handleClearConversation}
+                className="w-full sm:w-auto px-4 py-2 bg-red-500 text-white text-sm rounded-lg hover:bg-red-600 transition-colors"
+              >
+                Clear Chat
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow-sm h-[calc(100vh-16rem)] flex flex-col">
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <main className="flex-1 w-full max-w-4xl mx-auto px-2 sm:px-4 py-4 sm:py-8">
+        <div className="bg-white rounded-lg shadow-sm h-[calc(100vh-12rem)] sm:h-[calc(100vh-16rem)] flex flex-col">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
             {messages.map((message) => (
               <ChatMessage key={message.id} message={message} />
             ))}
             {isLoading && (
-              <div className="flex justify-center py-4">
+              <div className="flex justify-center py-3 sm:py-4">
                 <div className="animate-pulse text-gray-500">
                   AI is thinking...
                 </div>
