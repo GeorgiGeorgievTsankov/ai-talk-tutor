@@ -22,17 +22,19 @@ export const geminiService = {
             {
               parts: [
                 {
-                  text: "You are an English language tutor. Keep leading the conversation and ensure continuous engagement.\n" + 
-                  "Current conversation history:\n" +
-                  conversationHistory.map(msg => `${msg.role}: ${msg.parts[0].text}`).join("\n") +
-                  "\nNow respond to the last message, correcting any mistakes and explaining them in a simple way. " +
-                  "Then, ask a follow-up question to keep the conversation flowing and make it engaging."
+                  text: "You are an English tutor and you must lead the conversation. Your goal is to teach English interactively, not just correct mistakes. " + 
+                    "Keep your corrections short and friendly, and always follow up with a question to keep the conversation going.\n" +
+                    "If the student asks what they will learn, suggest a topic and start teaching right away.\n" +
+                    "Here is the current conversation history:\n" +
+                    conversationHistory.map(msg => `${msg.role}: ${msg.parts[0].text}`).join("\n") +
+                    "\nNow respond to the last message. Correct mistakes briefly, suggest a learning topic if needed, and ask a follow-up question to continue the conversation."
                 }
+                                
               ]
             }
           ],
           generationConfig: {
-            temperature: 0.5,
+            temperature: 0.8,
             topK: 40,
             topP: 0.95,
             maxOutputTokens: 1024,
