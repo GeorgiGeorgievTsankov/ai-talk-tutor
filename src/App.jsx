@@ -168,7 +168,7 @@ function App() {
                 TalkTutor
               </h1>
             </div>
-            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 sm:ml-auto">
+            <div className="flex sm:flex-row items-center gap-3 sm:gap-4 sm:ml-auto">
               <DifficultySelector
                 difficulty={difficulty}
                 onChange={setDifficulty}
