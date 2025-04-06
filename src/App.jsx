@@ -49,7 +49,7 @@ function App() {
   useEffect(() => {
     if (!import.meta.env.VITE_DEEPSEEK_API_KEY) {
       console.error(
-        "DeepSeek API key is missing! Please check your .env file."
+        "Gemini API key is missing! Please check your .env file."
       );
     }
   }, []);
